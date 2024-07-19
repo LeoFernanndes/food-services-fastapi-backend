@@ -10,13 +10,15 @@ from infrastructure.persistence.sql_alchemy.repositories.user_repository import 
 user_router = APIRouter()
 
 
+def get_db():
+    with SessionLocal() as db:
+        return db
+
+
 def get_user_service():
-    try:
-        db = SessionLocal()
-        user_repository = UserSqlAlchemyRepository(db)
-        yield UserService(user_repository)
-    finally:
-        db.close()
+    db = get_db()
+    user_repository = UserSqlAlchemyRepository(db)
+    yield UserService(user_repository)
 
 
 @user_router.get("/{id}")
