@@ -3,22 +3,10 @@ from fastapi.exceptions import HTTPException
 
 from application.authentication.dtos.user_dtos import UserCreateDto, UserUpdateDto
 from application.authentication.services.user_service import UserService
-from infrastructure.persistence.sql_alchemy.database import SessionLocal
-from infrastructure.persistence.sql_alchemy.repositories.user_repository import UserSqlAlchemyRepository
+from presentation.dependencies import get_user_service
 
 
 user_router = APIRouter()
-
-
-def get_db():
-    with SessionLocal() as db:
-        return db
-
-
-def get_user_service():
-    db = get_db()
-    user_repository = UserSqlAlchemyRepository(db)
-    yield UserService(user_repository)
 
 
 @user_router.get("/{id}")
@@ -30,7 +18,7 @@ def get_user(id: int, user_service: UserService = Depends(get_user_service)):
 
 
 @user_router.get("/")
-def gest_users(user_service: UserService = Depends(get_user_service), items_per_page: int = Query(1000, ge=0), page: int = Query(0, ge=0)):
+def get_users(user_service: UserService = Depends(get_user_service), items_per_page: int = Query(1000, ge=0), page: int = Query(0, ge=0)):
     return user_service.get_all_users(items_per_page, page)
 
 

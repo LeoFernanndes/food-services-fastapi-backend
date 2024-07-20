@@ -9,6 +9,10 @@ class UserRepository(ABC):
     @abstractmethod
     def get_by_id(self, id: int) -> User | None:
         pass
+    
+    @abstractmethod
+    def get_by_username(self, username: str) -> User | None:
+        pass
 
     @abstractmethod
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[User]:

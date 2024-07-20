@@ -16,6 +16,12 @@ class UserSqlAlchemyRepository(BaseSqlAlchemyRepository, UserRepository):
         if not user:
             return None
         return user.to_domain()
+    
+    def get_by_username(self, username: str) -> User | None:
+        user: UserOrmModel = self._session.query(UserOrmModel).filter(UserOrmModel.username == username).first()
+        if not user:
+            return None
+        return user.to_domain()
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[User]:
         users = self._session.query(UserOrmModel).order_by(UserOrmModel.id).offset(offset).limit(limit).all()

@@ -10,8 +10,9 @@ class UserCreateDto(BaseUserDto):
     password: str
 
 
-class UserDto(UserCreateDto):
+class UserDto(BaseUserDto):
     id: int
+    email: str
 
 
 class UserUpdateDto(BaseUserDto):

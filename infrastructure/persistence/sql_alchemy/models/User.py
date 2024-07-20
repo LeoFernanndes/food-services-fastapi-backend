@@ -10,9 +10,9 @@ class UserOrmModel(Base, BaseOrmModel):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String)
-    email = Column(String)
-    password = Column(String)
+    username = Column(String, nullable=False, unique=True)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
 
     def to_domain(self) -> User:
         return User(self.id, self.username, self.email, self.password)

@@ -57,6 +57,6 @@ def seed_data(session_):
 
 
 def test_get_user_200(seed_data, client):
-    response = client.get("/api/users/1")
+    response = client.get("/users/1")
     json_response = response.json()
     assert json_response["id"] == 1
