@@ -10,7 +10,7 @@ from presentation.http.fastapi.routers.auth import auth_router
 
 # TODO: check if it is possible to use ormmodel capabilities to get a parsed integrity error handler on repositories
 # TODO: check if it is possible to add database definitions on domain model to be implemented in the orm models
-
+# TODO: find a way of running testcontainers on the image building to user it as part of a ci pipeline
 
 load_dotenv()
 logger = logging.getLogger(__name__)
