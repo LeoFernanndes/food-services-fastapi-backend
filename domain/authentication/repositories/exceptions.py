@@ -1,0 +1,3 @@
+class DatabaseIntegrityError(Exception):
+    pass
+

@@ -45,18 +45,109 @@ def client(session_):
 
 
 @pytest.fixture
-def seed_data(session_):
+def seed_data(session_, engine):
     session_.add_all([
-        UserOrmModel(id=1, username="username1", email="email1@email.com", password="password1"),
-        UserOrmModel(id=2, username="username2", email="email2@email.com", password="password2"),
-        UserOrmModel(id=3, username="username3", email="email3@email.com", password="password3"),
-        UserOrmModel(id=4, username="username4", email="email4@email.com", password="password4"),
-        UserOrmModel(id=5, username="username5", email="email5@email.com", password="password5"),
+        UserOrmModel(username="username1", email="email1@email.com", password="password1"),
+        UserOrmModel(username="username2", email="email2@email.com", password="password2"),
+        UserOrmModel(username="username3", email="email3@email.com", password="password3"),
+        UserOrmModel(username="username4", email="email4@email.com", password="password4"),
+        UserOrmModel(username="username5", email="email5@email.com", password="password5")
     ])
     session_.commit()
 
 
 def test_get_user_200(seed_data, client):
     response = client.get("/users/1")
+    expected_result = {
+        "id": 1,
+        "username": "username1",
+        "email": "email1@email.com"
+    }
     json_response = response.json()
-    assert json_response["id"] == 1
+    assert response.status_code == 200
+    assert json_response == expected_result
+
+
+def test_get_user_404(seed_data, client):
+    response = client.get("/users/404")
+    assert response.status_code == 404
+
+
+def test_list_users_200(seed_data, client):
+    response = client.get("/users")
+    assert response.status_code == 200
+    json_response = response.json()
+    assert len(json_response) == 5
+
+
+def test_create_user_201(seed_data, client: TestClient):
+    payload = {
+        "username": "username6",
+        "email": "email6@email.com",
+        "password": "password6"
+    }
+    expected_result = {
+        "id": 6,
+        "username": "username6",
+        "email": "email6@email.com"
+    }
+    response = client.post("/users", json=payload)
+    assert response.status_code == 201
+    json_response = response.json()
+    assert json_response == expected_result
+
+
+def test_create_user_400(seed_data, client):
+    payload = {
+        "username": "username1",
+        "email": "email1@email.com",
+        "password": "password1"
+    }
+    response = client.post("/users", json=payload)
+    assert response.status_code == 400
+    json_response = response.json()
+    assert json_response == {"detail": ["Duplicated username and or email."]}
+
+
+def test_update_user_200(seed_data, client):
+    payload = {
+        "username": "updated_username6",
+        "email": "updated_email6@email.com",
+        "password": "updated_password6"
+    }
+    expected_result = {
+        "id": 1,
+        "username": "updated_username6",
+        "email": "email1@email.com"
+    }
+    response = client.put("/users/1", json=payload)
+    assert response.status_code == 200
+    json_response = response.json()
+    assert json_response == expected_result
+
+
+def test_update_user_400(seed_data, client):
+    payload = {
+        "username": "username1",
+        "email": "email1@email.com",
+        "password": "password1"
+    }
+    response = client.post("/users", json=payload)
+    assert response.status_code == 400
+    json_response = response.json()
+    assert json_response == {"detail": ["Duplicated username and or email."]}
+
+
+def test_update_user_404(seed_data, client):
+    payload = {
+        "username": "username1",
+        "email": "email1@email.com",
+        "password": "password1"
+    }
+    response = client.put("/users/404", json=payload)
+    assert response.status_code == 404
+
+
+def test_delete_user(seed_data, client):
+    response = client.delete("/users/1")
+    assert response.status_code == 204

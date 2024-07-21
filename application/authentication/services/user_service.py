@@ -51,7 +51,7 @@ class UserService:
         updated_user = self._user_repository.save(user)
         return UserDto(id=updated_user.id, username=updated_user.username, email=updated_user.email, password=updated_user.password)
 
-    def delete_user(self, id) -> None:
+    def delete_user_by_id(self, id) -> None:
         return self._user_repository.delete(id)
 
     def _verify_password(self, plain: str, hashed: str):

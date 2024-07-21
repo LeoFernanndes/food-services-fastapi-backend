@@ -1,6 +1,8 @@
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from domain.authentication.entities.user import User
+from domain.authentication.repositories.exceptions import DatabaseIntegrityError
 from domain.authentication.repositories.user_repository import UserRepository
 from infrastructure.persistence.sql_alchemy.repositories.base_sql_alchemy_repository import BaseSqlAlchemyRepository
 from infrastructure.persistence.sql_alchemy.models.User import UserOrmModel
@@ -32,18 +34,29 @@ class UserSqlAlchemyRepository(BaseSqlAlchemyRepository, UserRepository):
     def save(self, user: User) -> User:
         old_user = self._session.query(UserOrmModel).filter(UserOrmModel.id == user.id).first()
         if old_user:
-            old_user.email = user.email
-            old_user.username = user.username
-            old_user.password = user.password
-            self._session.merge(old_user)
-            self._session.commit()
-            return old_user
+            try:
+                old_user.email = user.email
+                old_user.username = user.username
+                old_user.password = user.password
+                self._session.merge(old_user)
+                self._session.commit()
+                return old_user
+            except IntegrityError as e:
+                raise DatabaseIntegrityError("Duplicated username and or email.")
 
-        user_orm_model = UserOrmModel.from_entity(user)
-        self._session.add(user_orm_model)
-        self._session.commit()
-        self._session.refresh(user_orm_model)
-        return user_orm_model.to_domain()
+        try:
+            user_orm_model = UserOrmModel.from_entity(user)
+            self._session.add(user_orm_model)
+            self._session.commit()
+            self._session.refresh(user_orm_model)
+            return user_orm_model.to_domain()
+        except IntegrityError as e:
+            raise DatabaseIntegrityError("Duplicated username and or email.")
 
     def delete(self, id: int) -> None:
-        pass
+        user = self._session.query(UserOrmModel).filter(UserOrmModel.id == id).first()
+        if not user:
+            raise Exception("User not found.")
+        self._session.delete(user)
+        self._session.commit()
+        return None

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Query
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 
 from application.authentication.dtos.user_dtos import UserCreateDto, UserUpdateDto
 from application.authentication.services.user_service import UserService
+from domain.authentication.repositories.exceptions import DatabaseIntegrityError
 from presentation.dependencies import get_user_service
 
 
@@ -24,13 +26,31 @@ def get_users(user_service: UserService = Depends(get_user_service), items_per_p
 
 @user_router.post("/")
 def create_user(user: UserCreateDto, user_service: UserService = Depends(get_user_service)):
-    create_user_dto = user_service.create_user(user)
-    return create_user_dto
+    try:
+        create_user_dto = user_service.create_user(user)
+        return JSONResponse(create_user_dto.model_dump(), status_code=201)
+    except DatabaseIntegrityError as e:
+        raise HTTPException(status_code=400, detail=e.args)
+    except Exception as e:
+        raise HTTPException(status_code=500)
 
 
 @user_router.put("/{id}")
 def update_user(id: int, user_dto: UserUpdateDto, user_service: UserService = Depends(get_user_service)):
     if not user_service.get_user_by_id(id):
         raise HTTPException(404)
-    updated_user_dto = user_service.update_user(id, user_dto)
-    return updated_user_dto
+    try:
+        updated_user_dto = user_service.update_user(id, user_dto)
+        return updated_user_dto
+    except DatabaseIntegrityError as e:
+        raise HTTPException(status_code=400, detail=e.args)
+    except:
+        raise HTTPException(status_code=500)
+
+
+@user_router.delete("/{id}")
+def delete_user(id: int, user_service: UserService = Depends(get_user_service)):
+    if not user_service.get_user_by_id(id):
+        raise HTTPException(404)
+    user_service.delete_user_by_id(id)
+    return JSONResponse(content=None, status_code=204)
