@@ -1,4 +1,5 @@
 import jwt
+import redis
 
 from datetime import timedelta
 from fastapi import APIRouter, Depends, status, Header
@@ -11,6 +12,7 @@ from application.authentication.services.authentication_service import Authentic
 from application.authentication.dtos.authentication_dtos import TokenPairResponseDto, TokenData
 from application.authentication.services.user_service import UserService
 from domain.authentication.entities.user import User
+from infrastructure.cache.redis import redis_client
 from presentation.dependencies import get_authentication_service, get_user_service
 
 
@@ -31,7 +33,7 @@ def get_current_user(
         auth_service: Annotated[AuthenticationService, Depends(get_authentication_service)]
     ):
     try:
-        auth_service.decode_access_token(access_token=token)
+        return auth_service.decode_access_token(access_token=token)
     except:
         raise credentials_exception
 
@@ -57,7 +59,7 @@ def refresh_auth_and_refresh_tokens(
         token_data = auth_service.decode_refresh_token(refresh)
     except:
         raise credentials_exception
-    return auth_service.create_token_pair(token_data)
+    return auth_service.refresh_token_pair(token_data, refresh)
 
 
 @auth_router.get("/me")
