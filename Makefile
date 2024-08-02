@@ -1,5 +1,4 @@
 test:
-	docker compose up -d
-	export PYTHONPATH=$(pwd)
+	docker compose up -d redis
 	pytest
-	docker compose down
+	docker compose down redis
