@@ -1,4 +1,7 @@
+import os
+
 import pytest
+import redis
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -7,6 +10,7 @@ from testcontainers.postgres import PostgresContainer
 
 from application.authentication.services.authentication_service import AuthenticationService
 from application.authentication.services.user_service import UserService
+from infrastructure.cache.redis_cache_service import RedisCacheService
 from infrastructure.persistence.sql_alchemy.database import Base
 from infrastructure.persistence.sql_alchemy.repositories.user_repository import UserSqlAlchemyRepository
 from presentation.http.fastapi.main import app
@@ -35,7 +39,9 @@ def client(session_):
 
     def override_get_authentication_service():
         user_repository = UserSqlAlchemyRepository(session_)
-        return AuthenticationService(user_repository=user_repository)
+        redis_client = redis.Redis(host=os.getenv("REDIS_HOST"), port=os.getenv("REDIS_PORT"), decode_responses=True)
+        cache_service = RedisCacheService(redis_client)
+        return AuthenticationService(user_repository=user_repository, cache_service=cache_service)
 
     def override_get_user_service():
         user_repository = UserSqlAlchemyRepository(session_)

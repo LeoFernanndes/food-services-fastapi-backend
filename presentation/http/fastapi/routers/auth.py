@@ -1,18 +1,12 @@
-import jwt
-import redis
-
-from datetime import timedelta
 from fastapi import APIRouter, Depends, status, Header
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
 from typing import Annotated
 
 from application.authentication.services.authentication_service import AuthenticationService
 from application.authentication.dtos.authentication_dtos import TokenPairResponseDto, TokenData
 from application.authentication.services.user_service import UserService
 from domain.authentication.entities.user import User
-from infrastructure.cache.redis import redis_client
 from presentation.dependencies import get_authentication_service, get_user_service
 
 
