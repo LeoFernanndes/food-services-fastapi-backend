@@ -60,10 +60,10 @@ class UserService:
     def get_password_hash(self, password: str):
         return self.pwd_context.hash(password)
 
-    def authenticate_user(self, username: str, password: str):
+    def check_password_is_valid(self, username: str, password: str):
         user = self._user_repository.get_by_username(username)
         if not user:
             return False
         if not self._verify_password(password, user.password):
             return False
-        return user
+        return True
