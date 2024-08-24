@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:16.0
+    restart: unless-stopped
+    container_name: 'database-fs'
+    environment:
+      - POSTGRES_DB=fs-database
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password123
+    ports:
+      - '5432:5432'
+
+  redis:
+    container_name: 'redis-fs'
+    image: redis:7.4.0
+    restart: always
+    ports:
+      - '6379:6379'

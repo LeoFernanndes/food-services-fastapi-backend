@@ -11,4 +11,18 @@ Alembic 1.13.2 (sourced on requirements.txt)
 
 ## Setup
 ### Staging
+Before starting, be sure ports 8000 for api, 5432 for postgres and 6379 for redis are available.  
 `docker-compose -f docker-compose.staging.yml`
+
+### Development
+Before starting, be sure ports 5432 for postgres and 6379 for redis are available.  
+1. Spin up backing services:  
+   `docker-compose -f docker-compose.dev.yml`
+2. (optional) Create a virtual environment:  
+   `python3 -m venv venv`
+3. Install python depencies:  
+   `pip install -r requirements.txt`
+4. Export root path as PYTHONPATH.  
+   On ubuntu, for example, `export PYTHONPATH=$(pwd)`
+5. Run api:  
+   `python3 ./presentation/http/fastapi/main.py`
