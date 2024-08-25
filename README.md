@@ -1,7 +1,7 @@
 # Food Services Fastapi Backend
 
 Backend application to centralize services related to restaurant management, delivery, recipes, etc.  
-![Api docs image](https://drive.google.com/file/d/1oPS0CMFyaEPzrnWnng0ka9whX9Tef86C/view)
+![Api docs image](https://leofernandes.s3.sa-east-1.amazonaws.com/github/food-services/Screenshot+from+2024-08-25+16-28-31.png)
 
 
 ## Dependencies 
