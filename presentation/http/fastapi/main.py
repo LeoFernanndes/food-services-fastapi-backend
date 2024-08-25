@@ -15,9 +15,20 @@ from presentation.http.fastapi.routers.auth import auth_router
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-app = FastAPI(root_path="")
-app.include_router(user_router, prefix="/users")
-app.include_router(auth_router, prefix="/auth")
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Operations with users.",
+    },
+    {
+        "name": "auth",
+        "description": "Authentication logic.",
+    },
+]
+
+app = FastAPI(root_path="", title="Food Services Api", openapi_tags=tags_metadata)
+app.include_router(user_router, prefix="/users", tags=["users"])
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info", reload_excludes=["./database/*"])
