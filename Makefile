@@ -1,4 +1,4 @@
 test:
-	docker compose up -d redis
+	docker compose -f docker-compose.dev.yml up -d redis
 	pytest
-	docker compose down redis
+	docker compose -f docker-compose.dev.yml down redis
