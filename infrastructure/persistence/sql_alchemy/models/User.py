@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
 
 from domain.authentication.entities.user import User
 from infrastructure.persistence.sql_alchemy.database import Base
