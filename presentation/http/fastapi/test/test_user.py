@@ -9,8 +9,8 @@ from application.authentication.services.user_service import UserService
 from infrastructure.persistence.sql_alchemy.database import Base
 from infrastructure.persistence.sql_alchemy.models.User import UserOrmModel
 from infrastructure.persistence.sql_alchemy.repositories.user_repository import UserSqlAlchemyRepository
+from presentation.dependencies import get_user_service
 from presentation.http.fastapi.main import app
-from presentation.http.fastapi.routers.user import get_user_service
 
 
 @pytest.fixture(scope='session')

@@ -4,8 +4,9 @@ from alembic import context
 
 from dotenv import load_dotenv
 from logging.config import fileConfig
-from sqlalchemy import create_engine, engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import create_engine
+
+from infrastructure.persistence.sql_alchemy.database import Base
 
 
 load_dotenv()
@@ -24,7 +25,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.base.metadata
-target_metadata = None
+target_metadata = [Base.metadata]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
