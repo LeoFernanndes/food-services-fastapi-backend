@@ -57,5 +57,6 @@ def refresh_auth_and_refresh_tokens(
 
 
 @auth_router.get("/me")
-def who_am_i(current_user: Annotated[User, Depends(get_current_user)]):
-    return current_user
+def who_am_i(current_user: Annotated[User, Depends(get_current_user)], user_service: Annotated[UserService, Depends(get_user_service)]):
+    user = user_service.get_user_by_username(current_user.username)
+    return user

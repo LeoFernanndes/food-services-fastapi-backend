@@ -3,6 +3,7 @@ import uvicorn
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from presentation.http.fastapi.routers.user import user_router
 from presentation.http.fastapi.routers.auth import auth_router
@@ -27,6 +28,18 @@ tags_metadata = [
 ]
 
 app = FastAPI(root_path="", title="Food Services Api", openapi_tags=tags_metadata)
+
+origins = [
+    'http://localhost:3000'
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
