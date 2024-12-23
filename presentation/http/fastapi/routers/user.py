@@ -1,8 +1,10 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, Query
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse, Response
 
-from application.authentication.dtos.user_dtos import UserCreateDto, UserUpdateDto
+from application.authentication.dtos.user_dtos import UserCreateDto, UserUpdateDto, UserDto
 from application.authentication.services.user_service import UserService
 from application.account_management.dtos.user_profile_dtos import UserProfileDto, UserProfileCreateDto, UserProfileUpdateDto
 from application.account_management.services.user_profile_service import UserProfileService
@@ -14,7 +16,7 @@ user_router = APIRouter()
 
 
 @user_router.get("/{user_id}")
-def get_user(user_id: int, user_service: UserService = Depends(get_user_service)):
+def get_user(user_id: int, user_service: UserService = Depends(get_user_service)) -> UserDto:
     user = user_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404)
@@ -22,12 +24,12 @@ def get_user(user_id: int, user_service: UserService = Depends(get_user_service)
 
 
 @user_router.get("/")
-def get_users(user_service: UserService = Depends(get_user_service), items_per_page: int = Query(1000, ge=0), page: int = Query(0, ge=0)):
+def get_users(user_service: UserService = Depends(get_user_service), items_per_page: int = Query(1000, ge=0), page: int = Query(0, ge=0)) -> List[UserDto]:
     return user_service.get_all_users(items_per_page, page)
 
 
 @user_router.post("/")
-def create_user(user: UserCreateDto, user_service: UserService = Depends(get_user_service)):
+def create_user(user: UserCreateDto, user_service: UserService = Depends(get_user_service)) -> UserDto:
     try:
         create_user_dto = user_service.create_user(user)
         return JSONResponse(create_user_dto.model_dump(), status_code=201)
@@ -38,7 +40,7 @@ def create_user(user: UserCreateDto, user_service: UserService = Depends(get_use
 
 
 @user_router.put("/{user_id}")
-def update_user(user_id: int, user_dto: UserUpdateDto, user_service: UserService = Depends(get_user_service)):
+def update_user(user_id: int, user_dto: UserUpdateDto, user_service: UserService = Depends(get_user_service)) -> UserDto:
     if not user_service.get_user_by_id(user_id):
         raise HTTPException(404)
     try:
@@ -64,7 +66,7 @@ def create_user_profile(
         user_profile_create_dto: UserProfileCreateDto,
         user_service: UserService = Depends(get_user_service),
         user_profile_service: UserProfileService = Depends(get_user_profile_service)
-    ):
+    ) -> UserProfileDto:
     user = user_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404)
@@ -115,7 +117,7 @@ def list_user_profiles(
         user_id: int,
         user_service: UserService = Depends(get_user_service),
         user_profile_service: UserProfileService = Depends(get_user_profile_service)
-    ):
+    ) -> List[UserProfileDto]:
     user = user_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404)
@@ -129,7 +131,7 @@ def update_user_profile(
         user_profile_update_dto: UserProfileUpdateDto,
         user_profile_service: UserProfileService = Depends(get_user_profile_service),
         user_service: UserService = Depends(get_user_service)
-    ):
+    ) -> UserProfileDto:
     user = user_service.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404)

@@ -3,8 +3,9 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
 
-from application.authentication.services.authentication_service import AuthenticationService
+from application.authentication.dtos.user_dtos import UserDto
 from application.authentication.dtos.authentication_dtos import TokenPairResponseDto, TokenData
+from application.authentication.services.authentication_service import AuthenticationService
 from application.authentication.services.user_service import UserService
 from domain.authentication.entities.user import User
 from presentation.dependencies import get_authentication_service, get_user_service
@@ -57,6 +58,6 @@ def refresh_auth_and_refresh_tokens(
 
 
 @auth_router.get("/me")
-def who_am_i(current_user: Annotated[User, Depends(get_current_user)], user_service: Annotated[UserService, Depends(get_user_service)]):
+def who_am_i(current_user: Annotated[User, Depends(get_current_user)], user_service: Annotated[UserService, Depends(get_user_service)]) -> UserDto:
     user = user_service.get_user_by_username(current_user.username)
     return user
