@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from presentation.http.fastapi.routers.user import user_router
 from presentation.http.fastapi.routers.auth import auth_router
+from presentation.http.fastapi.routers.recipe import recipes_management_router
 
 
 # TODO: check if it is possible to use ormmodel capabilities to get a parsed integrity error handler on repositories
@@ -25,6 +26,10 @@ tags_metadata = [
         "name": "auth",
         "description": "Authentication logic.",
     },
+{
+        "name": "recipes-management",
+        "description": "Recipes management logic.",
+    },
 ]
 
 app = FastAPI(root_path="", title="Food Services Api", openapi_tags=tags_metadata)
@@ -42,6 +47,7 @@ app.add_middleware(
 
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(recipes_management_router, prefix="/recipes-management", tags=['recipes-management'])
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info", reload_excludes=["./database/*"])
