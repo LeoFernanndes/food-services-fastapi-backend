@@ -10,7 +10,7 @@ from infrastructure.persistence.sql_alchemy.models.IngredientMeasurementUnit imp
 from infrastructure.persistence.sql_alchemy.repositories.base_sql_alchemy_repository import BaseSqlAlchemyRepository
 
 
-class IngredientMeasurementUnitRepository(BaseSqlAlchemyRepository, IngredientMeasurementUnitRepository):
+class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, IngredientMeasurementUnitRepository):
 
     def __init__(self, session: Session):
         BaseSqlAlchemyRepository.__init__(self, session)
