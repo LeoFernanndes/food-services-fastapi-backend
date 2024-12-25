@@ -6,6 +6,8 @@ from application.recipe.dto.ingredient_dtos import IngredientCreateDto, Ingredie
 from application.recipe.dto.ingredient_measurement_unit_dtos import IngredientMeasurementUnitCreateDto, IngredientMeasurementUnitDto, IngredientMeasurementUnitUpdateDto
 from application.recipe.dto.recipe_dtos import RecipeCreateDto, RecipeDto, RecipeUpdateDto
 from domain.account_management.repositories.user_profile_repository import UserProfileRepository
+from domain.base.exceptions import NotFoundDomainException
+from domain.recipes.entities.ingredientcategory import IngredientCategory
 from domain.recipes.entities.ingredient_measurement_unit import IngredientMeasurementUnit
 from domain.recipes.repositories.category_repository import CategoryRepository
 from domain.recipes.repositories.ingredient_measurement_unit_repository import IngredientMeasurementUnitRepository
@@ -16,13 +18,13 @@ from domain.recipes.repositories.recipe_repository import RecipeRepository
 class RecipeService:
     def __init__(
         self,
-        # category_repository: CategoryRepository,
+        ingredient_category_repository: CategoryRepository,
         ingredient_measurement_unit_repository: IngredientMeasurementUnitRepository,
         # ingredient_repository: IngredientRepository,
         # recipe_repository: RecipeRepository,
         # user_profile_repository: UserProfileRepository
     ):
-        # self.category_repository = category_repository
+        self._category_repository = ingredient_category_repository
         self._ingredient_measurement_unit_repository = ingredient_measurement_unit_repository
         # self.ingredient_repository = ingredient_repository
         # self.recipe_repository = recipe_repository
@@ -57,3 +59,31 @@ class RecipeService:
             raise NotFoundEntity()
         self._ingredient_measurement_unit_repository.delete(id)
         return None
+
+    def create_ingredient_category(self, category_create_dto: CategoryCreateDto) -> CategoryDto:
+        category_entity = IngredientCategory(id=None, name=category_create_dto.name)
+        created_category = self._category_repository.save(category_entity)
+        return CategoryDto(id=created_category.id, name=created_category.name)
+
+    def list_ingredient_categories(self, limit: int = 1000, offset: int = 0) -> List[CategoryDto]:
+        return [CategoryDto(id=c.id, name=c.name) for c in self._category_repository.get_all(limit=limit, offset=offset)]
+
+    def get_ingredient_category(self, id: int) -> CategoryDto:
+        category_entity = self._category_repository.get_by_id(id)
+        return CategoryDto(id=category_entity.id, name=category_entity.name)
+
+    def update_ingredient_category(self, id: int, category_update_dto: CategoryUpdateDto) -> CategoryDto:
+        try:
+            category_entity = self._category_repository.get_by_id(id)
+        except NotFoundDomainException:
+            raise NotFoundEntity()
+
+        category_entity.name = category_update_dto.name
+        updated_entity = self._category_repository.save(category_entity)
+        return CategoryDto(id=updated_entity.id, name=updated_entity.name)
+
+    def delete_ingredient_category(self, id) -> None:
+        try:
+            return self._category_repository.delete(id)
+        except NotFoundDomainException:
+            raise NotFoundEntity('Not found.')

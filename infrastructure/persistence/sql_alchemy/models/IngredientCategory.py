@@ -13,7 +13,6 @@ class IngredientCategoryOrmModel(Base, BaseOrmModel):
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     name = mapped_column(String, nullable=False, unique=False)
-    recipe_id = mapped_column(ForeignKey('recipes.id'))
 
     def to_domain(self) -> IngredientCategory:
         return IngredientCategory(id=self.id, name=self.name)
