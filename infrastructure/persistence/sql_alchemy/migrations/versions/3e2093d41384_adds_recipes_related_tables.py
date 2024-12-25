@@ -21,14 +21,14 @@ depends_on: Union[str, Sequence[str], None] = None
 def downgrade() -> None:
     op.drop_table('ingredients')
     op.drop_table('recipes')
-    op.drop_table('ingredient_categories')
+    op.drop_table('recipe_categories')
 
 
 def upgrade() -> None:
-    op.create_table('ingredient_categories',
+    op.create_table('recipe_categories',
     sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
     sa.Column('name', sa.VARCHAR(), nullable=False),
-    sa.PrimaryKeyConstraint('id', name='ingredient_categories_pkey')
+    sa.PrimaryKeyConstraint('id', name='recipe_categories_pkey')
     )
 
     op.create_table('recipes',
@@ -42,7 +42,7 @@ def upgrade() -> None:
     sa.Column('portions_quantity', sa.INTEGER(), nullable=False),
     sa.Column('category_id', sa.INTEGER(), nullable=False),
     sa.ForeignKeyConstraint(['user_profile_id'], ['user_profiles.id'], name='recipes_user_profile_id_fkey'),
-    sa.ForeignKeyConstraint(['category_id'], ['ingredient_categories.id'], name='recipes_ingredient_category_id_fkey'),
+    sa.ForeignKeyConstraint(['category_id'], ['recipe_categories.id'], name='recipes_recipe_category_id_fkey'),
     sa.PrimaryKeyConstraint('id', name='recipes_pkey')
     )
 

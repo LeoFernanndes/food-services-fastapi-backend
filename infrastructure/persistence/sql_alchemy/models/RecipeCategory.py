@@ -9,7 +9,7 @@ from infrastructure.persistence.sql_alchemy.models.Base import BaseOrmModel
 
 
 class RecipeCategoryOrmModel(Base, BaseOrmModel):
-    __tablename__ = "ingredient_categories"
+    __tablename__ = "recipe_categories"
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     name = mapped_column(String, nullable=False, unique=False)
