@@ -2,7 +2,7 @@ from typing import List, Self
 
 from domain.base.base_entity import BaseEntity
 from domain.account_management.entities.user_profile import UserProfile
-from domain.recipes.entities.ingredientcategory import IngredientCategory
+from domain.recipes.entities.recipe_category import RecipeCategory
 from domain.recipes.entities.ingredient import Ingredient
 
 
@@ -10,7 +10,7 @@ class Recipe(BaseEntity):
     def __init__(self, id: int | None, name: str, title: str, description: str,
                  user_profile: UserProfile, preparation_time_minutes: int,
                  preparation_steps: str, main_image: str, portions_quantity: int,
-                 category: IngredientCategory, ingredients: List[Ingredient]) -> Self:
+                 category: RecipeCategory, ingredients: List[Ingredient]) -> Self:
         self.id = id
         self.name = name
         self.title = title

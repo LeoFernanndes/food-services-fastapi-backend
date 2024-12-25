@@ -10,7 +10,7 @@ from application.account_management.services.user_profile_service import UserPro
 from application.recipe.services.recipe_service import RecipeService
 from infrastructure.cache.redis_cache_service import RedisCacheService
 from infrastructure.persistence.sql_alchemy.database import SqlAlchemySession
-from infrastructure.persistence.sql_alchemy.repositories.ingredient_category_repository import IngredientCategorySqlAlchemyRepository
+from infrastructure.persistence.sql_alchemy.repositories.recipe_category_repository import RecipeCategorySqlAlchemyRepository
 from infrastructure.persistence.sql_alchemy.repositories.ingredient_measurement_unit_repository import IngredientMeasurementUnitSqlAlchemyRepository
 from infrastructure.persistence.sql_alchemy.repositories.user_repository import UserSqlAlchemyRepository
 from infrastructure.persistence.sql_alchemy.repositories.user_profile_repository import UserProfileSqlAlchemyRepository
@@ -45,9 +45,9 @@ def get_user_profile_service():
 
 def get_recipe_service():
     with SqlAlchemySession() as db:
-        ingredient_category_repository = IngredientCategorySqlAlchemyRepository(db)
+        recipe_category_repository = RecipeCategorySqlAlchemyRepository(db)
         ingredient_measurement_unit_repository = IngredientMeasurementUnitSqlAlchemyRepository(db)
         yield RecipeService(
-            ingredient_category_repository=ingredient_category_repository,
+            ingredient_category_repository=recipe_category_repository,
             ingredient_measurement_unit_repository=ingredient_measurement_unit_repository
         )
