@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from domain.account_management.entities.user_profile import UserProfile
 from domain.account_management.repositories.user_profile_repository import UserProfileRepository
-from domain.base.exceptions import DatabaseIntegrityError
+from domain.base import exceptions as domain_exceptions
 from infrastructure.persistence.sql_alchemy.models.UserProfile import UserProfileOrmModel
 from infrastructure.persistence.sql_alchemy.repositories.base_sql_alchemy_repository import BaseSqlAlchemyRepository
 
@@ -49,7 +49,7 @@ class UserProfileSqlAlchemyRepository(BaseSqlAlchemyRepository, UserProfileRepos
                 self._session.commit()
                 return existent_user_profile.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError(f'{e}')
+                raise domain_exceptions.DatabaseIntegrityDomainException(f'{e}')
         else:
             try:
                 new_user_profile = UserProfileOrmModel.from_entity(user_profile)
@@ -58,4 +58,4 @@ class UserProfileSqlAlchemyRepository(BaseSqlAlchemyRepository, UserProfileRepos
                 self._session.refresh(new_user_profile)
                 return new_user_profile.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError(f'{e}')
+                raise domain_exceptions.DatabaseIntegrityDomainException(f'{e}')

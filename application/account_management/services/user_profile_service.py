@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from typing import List
 
 from application.account_management.dtos.user_profile_dtos import UserProfileCreateDto, UserProfileDto, UserProfileUpdateDto
-from application.base.exceptions import NotFoundEntity
+from application.base import exceptions as application_exceptions
 from domain.account_management.entities.user_profile import UserProfile
 from domain.account_management.repositories.user_profile_repository import UserProfileRepository
 from domain.authentication.repositories.user_repository import UserRepository
@@ -19,7 +19,7 @@ class UserProfileService:
     def create_user_profile(self, user_profile_create_dto: UserProfileCreateDto, user_id: int) -> UserProfileDto:
         user = self._user_repository.get_by_id(user_id)
         if not user:
-            raise NotFoundEntity(f'User not found')
+            raise application_exceptions.EntityNotFoundApplicationException(f'User not found')
 
         user_profile = UserProfile(
             id=None,

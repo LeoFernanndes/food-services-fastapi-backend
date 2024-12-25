@@ -1,6 +1,10 @@
-class DatabaseIntegrityError(Exception):
+class BaseDomainException(Exception):
     pass
 
 
-class NotFoundDomainException(Exception):
+class DatabaseIntegrityDomainException(BaseDomainException):
+    pass
+
+
+class NotFoundDomainException(BaseDomainException):
     pass

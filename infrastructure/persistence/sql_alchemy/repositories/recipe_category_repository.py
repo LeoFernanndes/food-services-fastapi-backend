@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from domain.base.exceptions import DatabaseIntegrityError, NotFoundDomainException
+from domain.base import exceptions as domain_exceptions
 from domain.recipes.entities.recipe_category import RecipeCategory
 from domain.recipes.repositories.recipe_category_repository import RecipeCategoryRepository
 from infrastructure.persistence.sql_alchemy.models.RecipeCategory import RecipeCategoryOrmModel
@@ -16,10 +16,8 @@ class RecipeCategorySqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeCategor
         BaseSqlAlchemyRepository.__init__(self, session)
 
     def delete(self, id: int) -> None:
-        orm_entity = self._session.query(RecipeCategoryOrmModel).filter(RecipeCategoryOrmModel.id == id).first()
-        if not orm_entity:
-            raise NotFoundDomainException('Not found.')
-        self._session.delete(orm_entity)
+        category_orm = self._session.query(RecipeCategoryOrmModel).filter(RecipeCategoryOrmModel.id == id).first()
+        self._session.delete(category_orm)
         self._session.commit()
         return None
 
@@ -32,7 +30,7 @@ class RecipeCategorySqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeCategor
     def get_by_id(self, id: int) -> RecipeCategory:
         category_orm = self._session.query(RecipeCategoryOrmModel).filter(RecipeCategoryOrmModel.id == id).first()
         if not category_orm:
-            raise NotFoundDomainException('Not found.')
+            raise domain_exceptions.NotFoundDomainException()
         return category_orm.to_domain()
 
     def save(self, category: RecipeCategory) -> RecipeCategory:
@@ -44,7 +42,7 @@ class RecipeCategorySqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeCategor
                 self._session.commit()
                 return persisted_object.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError("Database integrity error.")
+                raise domain_exceptions.DatabaseIntegrityDomainException()
         else:
             try:
                 orm_object = RecipeCategoryOrmModel.from_entity(category)
@@ -53,4 +51,4 @@ class RecipeCategorySqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeCategor
                 self._session.refresh(orm_object)
                 return orm_object.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError("Database integrity error.")
+                raise domain_exceptions.DatabaseIntegrityDomainException()

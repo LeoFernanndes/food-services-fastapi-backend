@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from domain.base.exceptions import DatabaseIntegrityError
+from domain.base import exceptions as domain_exceptions
 from domain.recipes.entities.ingredient_measurement_unit import IngredientMeasurementUnit
 from domain.recipes.repositories.ingredient_measurement_unit_repository import IngredientMeasurementUnitRepository
 from infrastructure.persistence.sql_alchemy.models.IngredientMeasurementUnit import IngredientMeasurementUnitOrmModel
@@ -17,8 +17,6 @@ class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, In
 
     def delete(self, id: int) -> None:
         unit = self._session.query(IngredientMeasurementUnitOrmModel).filter(IngredientMeasurementUnitOrmModel.id == id).first()
-        if not unit:
-            raise DatabaseIntegrityError("User not found.")
         self._session.delete(unit)
         self._session.commit()
         return None
@@ -32,7 +30,7 @@ class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, In
     def get_by_id(self, id: int) -> IngredientMeasurementUnit:
         unit = self._session.query(IngredientMeasurementUnitOrmModel).filter(IngredientMeasurementUnitOrmModel.id == id).first()
         if not unit:
-            return None
+            raise domain_exceptions.NotFoundDomainException()
         return unit.to_domain()
 
     def save(self, ingredient_measurement_unit: IngredientMeasurementUnit) -> IngredientMeasurementUnit:
@@ -44,7 +42,7 @@ class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, In
                 self._session.commit()
                 return persisted_object.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError("Database integrity error.")
+                raise domain_exceptions.DatabaseIntegrityDomainException()
         else:
             try:
                 orm_object = IngredientMeasurementUnitOrmModel.from_entity(ingredient_measurement_unit)
@@ -53,4 +51,4 @@ class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, In
                 self._session.refresh(orm_object)
                 return orm_object.to_domain()
             except IntegrityError as e:
-                raise DatabaseIntegrityError("Database integrity error.")
+                raise domain_exceptions.DatabaseIntegrityDomainException()

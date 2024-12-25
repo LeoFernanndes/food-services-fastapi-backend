@@ -3,11 +3,10 @@ from typing import List
 from fastapi import APIRouter, Depends, Query
 from fastapi.exceptions import HTTPException
 
-from application.base.exceptions import NotFoundEntity
+from application.base import exceptions as application_exceptions
 from application.recipe.dto.recipe_category_dtos import RecipeCategoryCreateDto, CategoryDto, RecipeCategoryUpdateDto
 from application.recipe.dto.ingredient_measurement_unit_dtos import IngredientMeasurementUnitCreateDto, IngredientMeasurementUnitDto, IngredientMeasurementUnitUpdateDto
 from application.recipe.services.recipe_service import RecipeService
-from domain.base.exceptions import DatabaseIntegrityError, NotFoundDomainException
 from presentation.dependencies import get_recipe_service
 
 
@@ -23,7 +22,7 @@ recipe_category_router = APIRouter()
 def create_ingredient_measurement_unit(create_dto: IngredientMeasurementUnitCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> IngredientMeasurementUnitDto:
     try:
         return recipe_service.create_ingredient_measurement_unit(create_dto)
-    except DatabaseIntegrityError as e:
+    except application_exceptions.EntityValidationApplicationException as e:
         raise HTTPException(status_code=400, detail=e.args)
     except Exception as e:
         raise HTTPException(status_code=500)
@@ -41,19 +40,19 @@ def list_ingredient_measurement_units(recipe_service: RecipeService = Depends(ge
 def get_ingredient_measurement_unit(id: int, recipe_service: RecipeService = Depends(get_recipe_service)) -> IngredientMeasurementUnitDto:
     try:
         return recipe_service.get_ingredient_measurement_unit(id)
-    except NotFoundEntity:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
     except Exception as e:
         raise HTTPException(500, detail='Internal server error.')
 
 
-@ingredient_measurement_unit_router.put('/{id')
+@ingredient_measurement_unit_router.put('/{id}')
 def update_ingredient_measurement_unit(id: int, unit_update_dto: IngredientMeasurementUnitUpdateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> IngredientMeasurementUnitDto:
     try:
         return recipe_service.update_ingredient_measurement_unit(id, unit_update_dto)
-    except NotFoundEntity:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
-    except DatabaseIntegrityError:
+    except application_exceptions.EntityValidationApplicationException:
         raise HTTPException(400)
     except Exception as e:
         raise HTTPException(500, detail='Internal server error.')
@@ -63,7 +62,7 @@ def update_ingredient_measurement_unit(id: int, unit_update_dto: IngredientMeasu
 def delete_ingredient_measurement_unit(id: int, recipe_service: RecipeService = Depends(get_recipe_service)) -> None:
     try:
         return recipe_service.delete_ingredient_measurement_unit(id)
-    except NotFoundEntity:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
     except Exception as e:
         raise HTTPException(500, detail='Internal server error.')
@@ -73,7 +72,7 @@ def delete_ingredient_measurement_unit(id: int, recipe_service: RecipeService = 
 def create_recipe_category(category_create_dto: RecipeCategoryCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> CategoryDto:
     try:
         return recipe_service.create_recipe_category(category_create_dto)
-    except DatabaseIntegrityError as e:
+    except application_exceptions.EntityValidationApplicationException as e:
         raise HTTPException(status_code=400, detail=e.args)
     except Exception as e:
         raise HTTPException(status_code=500)
@@ -81,14 +80,17 @@ def create_recipe_category(category_create_dto: RecipeCategoryCreateDto, recipe_
 
 @recipe_category_router.get('/')
 def list_recipe_categories(recipe_service: RecipeService = Depends(get_recipe_service), items_per_page: int = Query(1000, ge=0), page: int = Query(0, ge=0)) -> List[CategoryDto]:
-    return recipe_service.list_recipe_categories(limit=items_per_page, offset=page)
+    try:
+        return recipe_service.list_recipe_categories(limit=items_per_page, offset=page)
+    except:
+        raise HTTPException(500, detail='Internal server error.')
 
 
 @recipe_category_router.get('/{id}')
 def get_recipe_category(id: int, recipe_service: RecipeService = Depends(get_recipe_service)) -> CategoryDto:
     try:
         return recipe_service.get_recipe_category(id)
-    except NotFoundDomainException:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
     except:
         raise HTTPException(500, detail='Internal server error.')
@@ -98,9 +100,9 @@ def get_recipe_category(id: int, recipe_service: RecipeService = Depends(get_rec
 def update_recipe_category(id: int, category_update_dto: RecipeCategoryUpdateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> CategoryDto:
     try:
         return recipe_service.update_recipe_category(id, category_update_dto)
-    except NotFoundEntity:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
-    except DatabaseIntegrityError:
+    except application_exceptions.EntityValidationApplicationException:
         raise HTTPException(400, detail='Bad request')
     except:
         raise HTTPException(500, detail='Internal server error.')
@@ -110,7 +112,7 @@ def update_recipe_category(id: int, category_update_dto: RecipeCategoryUpdateDto
 def delete_recipe_category(id: int, recipe_service: RecipeService = Depends(get_recipe_service)) -> None:
     try:
         return recipe_service.delete_recipe_category(id)
-    except NotFoundEntity:
+    except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found')
 
 
