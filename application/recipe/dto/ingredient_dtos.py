@@ -8,6 +8,7 @@ class BaseIngredientDto(BaseDto):
 class IngredientCreateDto(BaseIngredientDto):
     name: str
     measurement_unit_id: int
+    recipe_id: int
     
 
 class IngredientDto(IngredientCreateDto):

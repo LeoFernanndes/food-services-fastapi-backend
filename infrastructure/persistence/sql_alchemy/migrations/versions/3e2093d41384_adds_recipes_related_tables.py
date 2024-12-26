@@ -37,6 +37,7 @@ def upgrade() -> None:
     sa.Column('title', sa.VARCHAR(), nullable=False),
     sa.Column('description', sa.VARCHAR(), nullable=False),
     sa.Column('user_profile_id', sa.INTEGER(), nullable=False),
+    sa.Column('preparation_time_minutes', sa.INTEGER(), nullable=False),
     sa.Column('preparation_steps', sa.VARCHAR(), nullable=False),
     sa.Column('main_image', sa.VARCHAR(), nullable=False),
     sa.Column('portions_quantity', sa.INTEGER(), nullable=False),
@@ -50,7 +51,8 @@ def upgrade() -> None:
     sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
     sa.Column('name', sa.VARCHAR(), nullable=False),
     sa.Column('ingredient_measurement_unit_id', sa.Integer(), nullable=False),
-    sa.Column('recipe_id', sa.INTEGER(), nullable=False),
+    sa.Column('recipe_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['ingredient_measurement_unit_id'], ['ingredient_measurement_units.id'], name='ingredients_ingredient_measurement_unit_id_fkey'),
     sa.ForeignKeyConstraint(['recipe_id'], ['recipes.id'], name='ingredients_recipe_id_fkey'),
     sa.PrimaryKeyConstraint('id', name='ingredients_pkey')
     )

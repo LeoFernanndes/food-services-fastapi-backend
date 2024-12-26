@@ -10,6 +10,8 @@ from infrastructure.persistence.sql_alchemy.models.IngredientMeasurementUnit imp
 from infrastructure.persistence.sql_alchemy.repositories.base_sql_alchemy_repository import BaseSqlAlchemyRepository
 
 
+# TODO: Add handler for validation of deleting resources with foreign key restrictions
+
 class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, IngredientMeasurementUnitRepository):
 
     def __init__(self, session: Session):

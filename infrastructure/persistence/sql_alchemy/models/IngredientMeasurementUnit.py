@@ -1,7 +1,7 @@
 from typing import Self
 
 from sqlalchemy import Integer, String
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from domain.recipes.entities.ingredient_measurement_unit import IngredientMeasurementUnit
 from infrastructure.persistence.sql_alchemy.database import Base
@@ -14,6 +14,7 @@ class IngredientMeasurementUnitOrmModel(Base, BaseOrmModel):
     
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     name = mapped_column(String, nullable=False, unique=True)
+    ingredient: Mapped['IngredientOrmModel'] = relationship(back_populates='ingredient_measurement_unit')
 
     def to_domain(self) -> IngredientMeasurementUnit:
         return IngredientMeasurementUnit(id=self.id, name=self.name)
