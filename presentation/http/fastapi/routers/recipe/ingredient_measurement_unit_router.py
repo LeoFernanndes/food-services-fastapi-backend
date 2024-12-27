@@ -12,7 +12,7 @@ from presentation.dependencies import get_recipe_service
 ingredient_measurement_unit_router = APIRouter()
 
 
-@ingredient_measurement_unit_router.post('/')
+@ingredient_measurement_unit_router.post('/', status_code=201)
 def create_ingredient_measurement_unit(create_dto: IngredientMeasurementUnitCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> IngredientMeasurementUnitDto:
     try:
         return recipe_service.create_ingredient_measurement_unit(create_dto)
