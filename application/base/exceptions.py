@@ -2,5 +2,9 @@ class BaseApplicationException(Exception):
     pass
 
 
-class NotFoundEntity(BaseApplicationException):
+class EntityNotFoundApplicationException(BaseApplicationException):
+    pass
+
+
+class EntityValidationApplicationException(BaseApplicationException):
     pass
