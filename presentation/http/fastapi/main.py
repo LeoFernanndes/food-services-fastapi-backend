@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from presentation.http.fastapi.routers.user import user_router
 from presentation.http.fastapi.routers.auth import auth_router
-from presentation.http.fastapi.routers.recipe import recipes_management_router
+from presentation.http.fastapi.routers.recipe.root import recipes_management_router
 
 
 # TODO: check if it is possible to use ormmodel capabilities to get a parsed integrity error handler on repositories

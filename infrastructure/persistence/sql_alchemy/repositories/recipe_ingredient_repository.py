@@ -15,26 +15,26 @@ class RecipeIngredientSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeIngre
     def __init__(self, session: Session):
         BaseSqlAlchemyRepository.__init__(self, session)
 
-    def delete(self, id: int) -> None:
-        ingredient_orm = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == id).first()
+    def delete(self, recipe_id: int, id: int) -> None:
+        ingredient_orm = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == id, RecipeIngredientOrmModel.recipe_id == recipe_id).first()
         self._session.delete(ingredient_orm)
         self._session.commit()
         return None
 
-    def get_all(self, limit: int = 1000, offset: int = 0) -> List[RecipeIngredient]:
-        ingredients_orm = self._session.query(RecipeIngredientOrmModel).order_by(RecipeIngredientOrmModel.id).offset(offset).limit(limit).all()
+    def get_all(self, recipe_id: int, limit: int = 1000, offset: int = 0) -> List[RecipeIngredient]:
+        ingredients_orm = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.recipe_id == recipe_id).order_by(RecipeIngredientOrmModel.id).offset(offset).limit(limit).all()
         if not ingredients_orm:
             return []
         return [i.to_domain() for i in ingredients_orm]
 
-    def get_by_id(self, id: int) -> RecipeIngredient:
-        ingredient_orm = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == id).first()
+    def get_by_id(self, recipe_id: int, id: int) -> RecipeIngredient:
+        ingredient_orm = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == id, RecipeIngredientOrmModel.recipe_id == recipe_id).first()
         if not ingredient_orm:
             raise domain_exceptions.NotFoundDomainException()
         return ingredient_orm.to_domain()
 
-    def save(self, ingredient: RecipeIngredient) -> RecipeIngredient:
-        persisted_object: RecipeIngredientOrmModel = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == ingredient.id).first()
+    def save(self, recipe_id: int, ingredient: RecipeIngredient) -> RecipeIngredient:
+        persisted_object: RecipeIngredientOrmModel = self._session.query(RecipeIngredientOrmModel).filter(RecipeIngredientOrmModel.id == ingredient.id, RecipeIngredientOrmModel.recipe_id == recipe_id).first()
         if persisted_object:
             try:
                 persisted_object.quantity = ingredient.quantity
@@ -44,8 +44,6 @@ class RecipeIngredientSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeIngre
                 return persisted_object.to_domain()
             except IntegrityError as e:
                 raise domain_exceptions.DatabaseIntegrityDomainException()
-            except Exception as e:
-                pass
         else:
             try:
                 orm_object = RecipeIngredientOrmModel.from_entity(ingredient)
@@ -55,5 +53,3 @@ class RecipeIngredientSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeIngre
                 return orm_object.to_domain()
             except IntegrityError as e:
                 raise domain_exceptions.DatabaseIntegrityDomainException()
-            except Exception as e:
-                pass

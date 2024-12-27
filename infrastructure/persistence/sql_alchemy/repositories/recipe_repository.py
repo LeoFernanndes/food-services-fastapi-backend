@@ -51,6 +51,3 @@ class RecipeSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeRepository):
                 return orm_object.to_domain()
             except IntegrityError as e:
                 raise domain_exceptions.DatabaseIntegrityDomainException()
-            except Exception as e:
-                pass
-

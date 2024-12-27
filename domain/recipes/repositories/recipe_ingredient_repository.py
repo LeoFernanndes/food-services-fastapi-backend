@@ -7,17 +7,17 @@ from domain.recipes.entities.recipe_ingredient import RecipeIngredient
 class RecipeIngredientRepository(ABC):
     
     @abstractmethod
-    def delete(self, id: int) -> None:
+    def delete(self, recipe_id: int, id: int) -> None:
         pass
     
     @abstractmethod
-    def get_all(self, limit: int = 1000, offset: int = 0) -> List[RecipeIngredient]:
+    def get_all(self, recipe_id: int, limit: int = 1000, offset: int = 0) -> List[RecipeIngredient]:
         pass   
     
     @abstractmethod
-    def get_by_id(self, id: int) -> RecipeIngredient:
+    def get_by_id(self, recipe_id: int, id: int) -> RecipeIngredient:
         pass
     
     @abstractmethod
-    def save(self, ingredient: RecipeIngredient) -> RecipeIngredient:
+    def save(self, recipe_id: int, ingredient: RecipeIngredient) -> RecipeIngredient:
         pass
