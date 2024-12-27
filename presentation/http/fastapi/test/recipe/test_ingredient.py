@@ -183,7 +183,7 @@ def test_put_ingredient_400(seed_data, client):
 
 
 def test_delete_ingredient_204(seed_data, client):
-    response = client.delete('/recipes-management/ingredients/1')
+    response = client.delete('/recipes-management/ingredients/2')
     assert response.status_code == 204
 
 
