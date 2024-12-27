@@ -12,7 +12,7 @@ class RecipeCategoryOrmModel(Base, BaseOrmModel):
     __tablename__ = "recipe_categories"
 
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name = mapped_column(String, nullable=False, unique=False)
+    name = mapped_column(String, nullable=False, unique=True)
 
     def to_domain(self) -> RecipeCategory:
         return RecipeCategory(id=self.id, name=self.name)

@@ -28,7 +28,7 @@ def downgrade() -> None:
 def upgrade() -> None:
     op.create_table('recipe_categories',
     sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.VARCHAR(), nullable=False),
+    sa.Column('name', sa.VARCHAR(), nullable=False, unique=True),
     sa.PrimaryKeyConstraint('id', name='recipe_categories_pkey')
     )
 
