@@ -12,7 +12,7 @@ from presentation.dependencies import get_recipe_service
 recipe_category_router = APIRouter()
 
 
-@recipe_category_router.post('/')
+@recipe_category_router.post('/', status_code=201)
 def create_recipe_category(category_create_dto: RecipeCategoryCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> CategoryDto:
     try:
         return recipe_service.create_recipe_category(category_create_dto)
