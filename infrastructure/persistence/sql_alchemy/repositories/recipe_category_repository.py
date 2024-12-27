@@ -17,8 +17,13 @@ class RecipeCategorySqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeCategor
 
     def delete(self, id: int) -> None:
         category_orm = self._session.query(RecipeCategoryOrmModel).filter(RecipeCategoryOrmModel.id == id).first()
-        self._session.delete(category_orm)
-        self._session.commit()
+        if not category_orm:
+            raise domain_exceptions.NotFoundDomainException()
+        try:
+            self._session.delete(category_orm)
+            self._session.commit()
+        except IntegrityError:
+            raise domain_exceptions.DatabaseIntegrityDomainException()
         return None
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[RecipeCategory]:

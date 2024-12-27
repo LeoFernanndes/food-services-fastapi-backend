@@ -58,3 +58,8 @@ def delete_recipe_category(id: int, recipe_service: RecipeService = Depends(get_
         return recipe_service.delete_recipe_category(id)
     except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found')
+    except application_exceptions.EntityValidationApplicationException:
+        raise HTTPException(400, detail='Bad request')
+    except:
+        raise HTTPException(500, detail='Internal server error')
+
