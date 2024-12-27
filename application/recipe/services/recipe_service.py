@@ -282,3 +282,5 @@ class RecipeService:
             return self._ingredient_repository.delete(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException()

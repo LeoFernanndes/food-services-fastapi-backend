@@ -19,8 +19,11 @@ class IngredientSqlAlchemyRepository(BaseSqlAlchemyRepository, IngredientReposit
         unit = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == id).first()
         if not unit:
             raise domain_exceptions.NotFoundDomainException()
-        self._session.delete(unit)
-        self._session.commit()
+        try:
+            self._session.delete(unit)
+            self._session.commit()
+        except IntegrityError as e:
+            raise domain_exceptions.DatabaseIntegrityDomainException()
         return None
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[Ingredient]:
