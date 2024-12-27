@@ -16,29 +16,30 @@ class IngredientSqlAlchemyRepository(BaseSqlAlchemyRepository, IngredientReposit
         BaseSqlAlchemyRepository.__init__(self, session)
 
     def delete(self, id: int) -> None:
-        ingredient_orm = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == id).first()
-        self._session.delete(ingredient_orm)
+        unit = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == id).first()
+        if not unit:
+            raise domain_exceptions.NotFoundDomainException()
+        self._session.delete(unit)
         self._session.commit()
         return None
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[Ingredient]:
-        ingredients_orm = self._session.query(IngredientOrmModel).order_by(IngredientOrmModel.id).offset(offset).limit(limit).all()
-        if not ingredients_orm:
+        orm_objects = self._session.query(IngredientOrmModel).order_by(IngredientOrmModel.id).offset(offset).limit(limit).all()
+        if not orm_objects:
             return []
-        return [i.to_domain() for i in ingredients_orm]
+        return [orm_object.to_domain() for orm_object in orm_objects]
 
     def get_by_id(self, id: int) -> Ingredient:
-        ingredient_orm = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == id).first()
-        if not ingredient_orm:
+        unit = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == id).first()
+        if not unit:
             raise domain_exceptions.NotFoundDomainException()
-        return ingredient_orm.to_domain()
+        return unit.to_domain()
 
     def save(self, ingredient: Ingredient) -> Ingredient:
-        persisted_object: IngredientOrmModel = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == ingredient.id).first()
+        persisted_object = self._session.query(IngredientOrmModel).filter(IngredientOrmModel.id == ingredient.id).first()
         if persisted_object:
             try:
                 persisted_object.name = ingredient.name
-                persisted_object.ingredient_measurement_unit_id = ingredient.ingredient_measurement_unit_id
                 self._session.merge(persisted_object)
                 self._session.commit()
                 return persisted_object.to_domain()

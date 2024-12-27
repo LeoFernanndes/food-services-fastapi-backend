@@ -1,33 +1,38 @@
 from typing import List
 
 from application.base import exceptions as application_exceptions
+from application.recipe.dto.ingredient import IngredientCreateDto, IngredientDto, IngredientUpdateDto
 from application.recipe.dto.recipe_category_dtos import RecipeCategoryCreateDto, CategoryDto, RecipeCategoryUpdateDto
-from application.recipe.dto.ingredient_dtos import IngredientCreateDto, IngredientDto, IngredientUpdateDto
+from application.recipe.dto.recipe_ingredient_dtos import RecipeIngredientCreateDto, RecipeIngredientDto, RecipeIngredientUpdateDto
 from application.recipe.dto.ingredient_measurement_unit_dtos import IngredientMeasurementUnitCreateDto, IngredientMeasurementUnitDto, IngredientMeasurementUnitUpdateDto
 from application.recipe.dto.recipe_dtos import RecipeCreateDto, RecipeDto, RecipeUpdateDto
 from domain.account_management.repositories.user_profile_repository import UserProfileRepository
 from domain.base import exceptions as domain_exceptions
 from domain.recipes.entities.ingredient import Ingredient
+from domain.recipes.entities.recipe_ingredient import RecipeIngredient
 from domain.recipes.entities.recipe import Recipe
 from domain.recipes.entities.recipe_category import RecipeCategory
 from domain.recipes.entities.ingredient_measurement_unit import IngredientMeasurementUnit
+from domain.recipes.repositories.ingredient_repository import IngredientRepository
 from domain.recipes.repositories.recipe_category_repository import RecipeCategoryRepository
 from domain.recipes.repositories.ingredient_measurement_unit_repository import IngredientMeasurementUnitRepository
-from domain.recipes.repositories.ingredient_repository import IngredientRepository
+from domain.recipes.repositories.recipe_ingredient_repository import RecipeIngredientRepository
 from domain.recipes.repositories.recipe_repository import RecipeRepository
 
 
 class RecipeService:
     def __init__(
         self,
-        ingredient_measurement_unit_repository: IngredientMeasurementUnitRepository,
         ingredient_repository: IngredientRepository,
+        ingredient_measurement_unit_repository: IngredientMeasurementUnitRepository,
+        recipe_ingredient_repository: RecipeIngredientRepository,
         recipe_category_repository: RecipeCategoryRepository,
         recipe_repository: RecipeRepository,
         # user_profile_repository: UserProfileRepository
     ):
-        self._ingredient_measurement_unit_repository = ingredient_measurement_unit_repository
         self._ingredient_repository = ingredient_repository
+        self._ingredient_measurement_unit_repository = ingredient_measurement_unit_repository
+        self._recipe_ingredient_repository = recipe_ingredient_repository
         self._recipe_category_repository = recipe_category_repository
         self._recipe_repository = recipe_repository
         # self.user_profile_repository = user_profile_repository
@@ -105,41 +110,41 @@ class RecipeService:
             raise application_exceptions.EntityNotFoundApplicationException()
         return self._recipe_category_repository.delete(id)
 
-    def create_ingredient(self, ingredient_create_dto: IngredientCreateDto) -> IngredientDto:
-        ingredient = Ingredient(id=None, name=ingredient_create_dto.name, ingredient_measurement_unit_id=ingredient_create_dto.measurement_unit_id, recipe_id=ingredient_create_dto.recipe_id)
+    def create_recipe_ingredient(self, recipe_ingredient_create_dto: RecipeIngredientCreateDto) -> RecipeIngredientDto:
+        ingredient = RecipeIngredient(id=None, quantity=recipe_ingredient_create_dto.quantity, ingredient_id=recipe_ingredient_create_dto.ingredient_id, ingredient_measurement_unit_id=recipe_ingredient_create_dto.measurement_unit_id, recipe_id=recipe_ingredient_create_dto.recipe_id)
         try:
-            created_ingredient = self._ingredient_repository.save(ingredient)
+            created_ingredient = self._recipe_ingredient_repository.save(ingredient)
         except domain_exceptions.DatabaseIntegrityDomainException:
             raise application_exceptions.EntityValidationApplicationException()
-        return IngredientDto(id=created_ingredient.id, name=created_ingredient.name, measurement_unit_id=created_ingredient.ingredient_measurement_unit_id, recipe_id=created_ingredient.recipe_id)
+        return RecipeIngredientDto(id=created_ingredient.id, quantity=created_ingredient.quantity, ingredient_id=created_ingredient.ingredient_id, measurement_unit_id=created_ingredient.ingredient_measurement_unit_id, recipe_id=created_ingredient.recipe_id)
 
-    def get_ingredient(self, id) -> IngredientDto:
+    def get_recipe_ingredient(self, id) -> RecipeIngredientDto:
         try:
-            ingredient = self._ingredient_repository.get_by_id(id)
+            ingredient = self._recipe_ingredient_repository.get_by_id(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException
-        return IngredientDto(id=ingredient.id, name=ingredient.name, measurement_unit_id=ingredient.ingredient_measurement_unit_id, recipe_id=ingredient.recipe_id)
+        return RecipeIngredientDto(id=ingredient.id, quantity=ingredient.quantity, ingredient_id=ingredient.ingredient_id, measurement_unit_id=ingredient.ingredient_measurement_unit_id, recipe_id=ingredient.recipe_id)
 
-    def list_ingredients(self, limit: int = 1000, offset: int = 0) -> List[IngredientDto]:
-        ingredients = self._ingredient_repository.get_all(limit=limit, offset=offset)
-        return [IngredientDto(id=i.id, name=i.name, recipe_id=i.recipe_id, measurement_unit_id=i.ingredient_measurement_unit_id) for i in ingredients]
+    def list_recipe_ingredients(self, limit: int = 1000, offset: int = 0) -> List[RecipeIngredientDto]:
+        ingredients = self._recipe_ingredient_repository.get_all(limit=limit, offset=offset)
+        return [RecipeIngredientDto(id=i.id, quantity=i.quantity, ingredient_id=i.ingredient_id, recipe_id=i.recipe_id, measurement_unit_id=i.ingredient_measurement_unit_id) for i in ingredients]
 
-    def update_ingredient(self, id: int, ingredient_update_dto: IngredientUpdateDto) -> IngredientDto:
+    def update_recipe_ingredient(self, id: int, ingredient_update_dto: RecipeIngredientUpdateDto) -> RecipeIngredientDto:
         try:
-            ingredient = self._ingredient_repository.get_by_id(id)
+            ingredient = self._recipe_ingredient_repository.get_by_id(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
         ingredient.ingredient_measurement_unit_id = ingredient_update_dto.measurement_unit_id
-        ingredient.name = ingredient_update_dto.name
+        ingredient.quantity = ingredient_update_dto.quantity
         try:
-            updated_ingredient = self._ingredient_repository.save(ingredient)
+            updated_ingredient = self._recipe_ingredient_repository.save(ingredient)
         except domain_exceptions.DatabaseIntegrityDomainException:
             raise application_exceptions.EntityValidationApplicationException()
-        return IngredientDto(id=updated_ingredient.id, name=updated_ingredient.name, recipe_id=updated_ingredient.recipe_id, measurement_unit_id=updated_ingredient.ingredient_measurement_unit_id)
+        return RecipeIngredientDto(id=updated_ingredient.id, quantity=updated_ingredient.quantity, ingredient_id=updated_ingredient.ingredient_id, recipe_id=updated_ingredient.recipe_id, measurement_unit_id=updated_ingredient.ingredient_measurement_unit_id)
 
-    def delete_ingredient(self, id) -> None:
+    def delete_recipe_ingredient(self, id) -> None:
         try:
-            return self._ingredient_repository.delete(id)
+            return self._recipe_ingredient_repository.delete(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
 
@@ -220,3 +225,40 @@ class RecipeService:
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
         return self._recipe_repository.delete(id)
+
+    def create_ingredient(self, ingredient_create_dto: IngredientCreateDto) -> IngredientDto:
+        try:
+            ingredient = Ingredient(id=None, name=ingredient_create_dto.name)
+            created_ingredient = self._ingredient_repository.save(ingredient)
+            return IngredientDto(id=created_ingredient.id, name=created_ingredient.name)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException
+
+    def list_ingredients(self, limit: int = 1000, offset: int = 0) -> List[IngredientDto]:
+        ingredients = self._ingredient_repository.get_all(limit=limit, offset=offset)
+        return [IngredientDto(id=i.id, name=i.name) for i in ingredients]
+
+    def get_ingredient(self, id: int) -> IngredientDto:
+        try:
+            ingredient = self._ingredient_repository.get_by_id(id)
+            return IngredientDto(id=ingredient.id, name=ingredient.name)
+        except domain_exceptions.NotFoundDomainException:
+            raise application_exceptions.EntityNotFoundApplicationException()
+
+    def update_ingredient(self, id: int, ingredient_update_dto: IngredientUpdateDto) -> IngredientDto:
+        try:
+            ingredient = self._ingredient_repository.get_by_id(id)
+        except domain_exceptions.NotFoundDomainException:
+            raise application_exceptions.EntityNotFoundApplicationException()
+        ingredient.name = ingredient_update_dto.name
+        try:
+            updated_ingredient = self._ingredient_repository.save(ingredient)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException
+        return IngredientDto(id=updated_ingredient.id, name=updated_ingredient.name)
+
+    def delete_ingredient(self, id: int) -> None:
+        try:
+            return self._ingredient_repository.delete(id)
+        except domain_exceptions.NotFoundDomainException:
+            raise application_exceptions.EntityNotFoundApplicationException()

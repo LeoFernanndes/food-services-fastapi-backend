@@ -14,7 +14,7 @@ class IngredientMeasurementUnitOrmModel(Base, BaseOrmModel):
     
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     name = mapped_column(String, nullable=False, unique=True)
-    ingredient: Mapped['IngredientOrmModel'] = relationship(back_populates='ingredient_measurement_unit')
+    recipe_ingredient: Mapped['RecipeIngredientOrmModel'] = relationship(back_populates='ingredient_measurement_unit')
 
     def to_domain(self) -> IngredientMeasurementUnit:
         return IngredientMeasurementUnit(id=self.id, name=self.name)

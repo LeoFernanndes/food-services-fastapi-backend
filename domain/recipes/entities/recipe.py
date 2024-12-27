@@ -3,7 +3,7 @@ from typing import List, Self
 from domain.base.base_entity import BaseEntity
 from domain.account_management.entities.user_profile import UserProfile
 from domain.recipes.entities.recipe_category import RecipeCategory
-from domain.recipes.entities.ingredient import Ingredient
+from domain.recipes.entities.recipe_ingredient import RecipeIngredient
 
 
 class Recipe(BaseEntity):

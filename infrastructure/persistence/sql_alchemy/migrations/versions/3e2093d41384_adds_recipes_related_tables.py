@@ -19,6 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def downgrade() -> None:
+    op.drop_table('recipe_ingredients')
     op.drop_table('ingredients')
     op.drop_table('recipes')
     op.drop_table('recipe_categories')
@@ -49,10 +50,18 @@ def upgrade() -> None:
 
     op.create_table('ingredients',
     sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.VARCHAR(), nullable=False),
-    sa.Column('ingredient_measurement_unit_id', sa.Integer(), nullable=False),
-    sa.Column('recipe_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['ingredient_measurement_unit_id'], ['ingredient_measurement_units.id'], name='ingredients_ingredient_measurement_unit_id_fkey'),
-    sa.ForeignKeyConstraint(['recipe_id'], ['recipes.id'], name='ingredients_recipe_id_fkey'),
+    sa.Column('name', sa.VARCHAR(), nullable=False, unique=True),
     sa.PrimaryKeyConstraint('id', name='ingredients_pkey')
+    )
+
+    op.create_table('recipe_ingredients',
+    sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
+    sa.Column('quantity', sa.INTEGER(), nullable=False),
+    sa.Column('ingredient_id', sa.INTEGER(), nullable=False),
+    sa.Column('ingredient_measurement_unit_id', sa.INTEGER(), nullable=False),
+    sa.Column('recipe_id', sa.INTEGER(), nullable=False),
+    sa.ForeignKeyConstraint(['ingredient_measurement_unit_id'], ['ingredient_measurement_units.id'], name='recipe_ingredients_ingredient_measurement_unit_id_fkey'),
+    sa.ForeignKeyConstraint(['recipe_id'], ['recipes.id'], name='recipe_ingredients_recipe_id_fkey'),
+    sa.ForeignKeyConstraint(['ingredient_id'], ['ingredients.id'], name='recipe_ingredients_ingredient_id_fkey'),
+    sa.PrimaryKeyConstraint('id', name='recipe_ingredients_pkey')
     )

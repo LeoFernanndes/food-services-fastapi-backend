@@ -1,7 +1,7 @@
 from typing import List
 
 from application.base.base_dto import BaseDto
-from application.recipe.dto.ingredient_dtos import IngredientCreateDto
+from application.recipe.dto.recipe_ingredient_dtos import RecipeIngredientCreateDto
 
 
 class BaseRecipeDto(BaseDto):
