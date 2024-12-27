@@ -100,7 +100,10 @@ class RecipeService:
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
         category_entity.name = category_update_dto.name
-        updated_entity = self._recipe_category_repository.save(category_entity)
+        try:
+            updated_entity = self._recipe_category_repository.save(category_entity)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException()
         return CategoryDto(id=updated_entity.id, name=updated_entity.name)
 
     def delete_recipe_category(self, id) -> None:
