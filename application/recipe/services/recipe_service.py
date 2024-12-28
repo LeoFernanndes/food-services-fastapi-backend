@@ -73,7 +73,10 @@ class RecipeService:
             entity = self._ingredient_measurement_unit_repository.get_by_id(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        self._ingredient_measurement_unit_repository.delete(id)
+        try:
+            self._ingredient_measurement_unit_repository.delete(id)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException
         return None
 
     def create_recipe_category(self, category_create_dto: RecipeCategoryCreateDto) -> CategoryDto:

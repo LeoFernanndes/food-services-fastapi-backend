@@ -19,9 +19,15 @@ class IngredientMeasurementUnitSqlAlchemyRepository(BaseSqlAlchemyRepository, In
 
     def delete(self, id: int) -> None:
         unit = self._session.query(IngredientMeasurementUnitOrmModel).filter(IngredientMeasurementUnitOrmModel.id == id).first()
-        self._session.delete(unit)
-        self._session.commit()
-        return None
+        if not unit:
+            raise domain_exceptions.NotFoundDomainException()
+        try:
+            self._session.delete(unit)
+            self._session.commit()
+            return None
+        except IntegrityError:
+            raise domain_exceptions.DatabaseIntegrityDomainException()
+
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[IngredientMeasurementUnit]:
         units = self._session.query(IngredientMeasurementUnitOrmModel).order_by(IngredientMeasurementUnitOrmModel.id).offset(offset).limit(limit).all()

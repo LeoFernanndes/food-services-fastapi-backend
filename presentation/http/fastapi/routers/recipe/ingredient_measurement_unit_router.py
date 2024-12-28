@@ -58,5 +58,7 @@ def delete_ingredient_measurement_unit(id: int, recipe_service: RecipeService = 
         return recipe_service.delete_ingredient_measurement_unit(id)
     except application_exceptions.EntityNotFoundApplicationException:
         raise HTTPException(404, detail='Not found.')
+    except application_exceptions.EntityValidationApplicationException:
+        raise HTTPException(400, detail='Bad request')
     except Exception as e:
         raise HTTPException(500, detail='Internal server error.')
