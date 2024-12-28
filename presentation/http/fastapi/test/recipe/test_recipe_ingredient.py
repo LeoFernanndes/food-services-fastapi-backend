@@ -183,6 +183,21 @@ def test_post_recipe_ingredient_201(seed_data, client):
     assert json_response == expected_result
     
     
+def test_post_recipe_ingredient_missing_fields_422(seed_data, client):
+    # check recipe id is not handled from the payload
+    payload = {}
+    response = client.post('/recipes-management/recipes/1/recipe-ingredients', json=payload)
+    expected_result = {
+        'detail': {
+            'ingredient_id': ['Field required'],
+            'quantity': ['Field required'],
+            'ingredient_measurement_unit_id': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
+    
+    
 def test_post_recipe_ingredient_404(seed_data, client):
     payload = {
         "ingredient_id": 1,
@@ -221,6 +236,20 @@ def test_put_recipe_ingredient_200(seed_data, client):
     json_response = response.json()
     assert response.status_code == 200
     assert json_response == expected_result
+    
+
+def test_put_recipe_ingredient_missing_fields_422(seed_data, client):
+    # check recipe id is not handled from the payload
+    payload = {}
+    response = client.put('/recipes-management/recipes/1/recipe-ingredients/1', json=payload)
+    expected_result = {
+        'detail': {
+            'quantity': ['Field required'],
+            'ingredient_measurement_unit_id': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
     
 
 def test_put_inexistent_recipe_ingredient_404(seed_data, client):

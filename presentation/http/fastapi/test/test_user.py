@@ -95,6 +95,20 @@ def test_create_user_201(seed_data, client: TestClient):
     assert response.status_code == 201
     json_response = response.json()
     assert json_response == expected_result
+    
+
+def test_create_user_missing_fields_422(seed_data, client: TestClient):
+    payload = {}
+    expected_result = {
+        'detail': {
+            'username': ['Field required'],
+            'email': ['Field required'],
+            'password': ['Field required']
+        }
+    }
+    response = client.post("/users", json=payload)
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_create_user_400(seed_data, client):
@@ -124,6 +138,19 @@ def test_update_user_200(seed_data, client):
     assert response.status_code == 200
     json_response = response.json()
     assert json_response == expected_result
+    
+    
+def test_update_user_missing_fields_422(seed_data, client):
+    payload = {
+    }
+    expected_result = {
+        'detail': {
+            'username': ['Field required']
+        }
+    }
+    response = client.put("/users/1", json=payload)
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_update_user_400(seed_data, client):
