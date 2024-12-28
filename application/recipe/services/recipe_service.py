@@ -251,10 +251,11 @@ class RecipeService:
 
     def delete_recipe(self, id: int) -> None:
         try:
-            recipe = self._recipe_repository.get_by_id(id)
+            return self._recipe_repository.delete(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        return self._recipe_repository.delete(id)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException()
 
     def create_ingredient(self, ingredient_create_dto: IngredientCreateDto) -> IngredientDto:
         try:
