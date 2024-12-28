@@ -16,8 +16,13 @@ class RecipeSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeRepository):
 
     def delete(self, id: int) -> None:
         recipe_orm = self._session.query(RecipeOrmModel).filter(RecipeOrmModel.id == id).first()
-        self._session.delete(recipe_orm)
-        self._session.commit()
+        if not recipe_orm:
+            raise domain_exceptions.NotFoundDomainException()
+        try:
+            self._session.delete(recipe_orm)
+            self._session.commit()
+        except IntegrityError:
+            raise domain_exceptions.DatabaseIntegrityDomainException()
         return None
 
     def get_all(self, limit: int = 1000, offset: int = 0) -> List[Recipe]:
@@ -37,6 +42,13 @@ class RecipeSqlAlchemyRepository(BaseSqlAlchemyRepository, RecipeRepository):
         if orm_object:
             try:
                 orm_object.name = recipe.name
+                orm_object.title = recipe.title
+                orm_object.description = recipe.description
+                orm_object.preparation_time_minutes = recipe.preparation_time_minutes
+                orm_object.preparation_steps = recipe.preparation_steps
+                orm_object.main_image = recipe.main_image
+                orm_object.portions_quantity = recipe.portions_quantity
+                orm_object.category_id = recipe.category_id
                 self._session.merge(orm_object)
                 self._session.commit()
                 return orm_object.to_domain()

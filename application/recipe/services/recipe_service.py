@@ -73,7 +73,10 @@ class RecipeService:
             entity = self._ingredient_measurement_unit_repository.get_by_id(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        self._ingredient_measurement_unit_repository.delete(id)
+        try:
+            self._ingredient_measurement_unit_repository.delete(id)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException
         return None
 
     def create_recipe_category(self, category_create_dto: RecipeCategoryCreateDto) -> CategoryDto:
@@ -122,12 +125,12 @@ class RecipeService:
             recipe = self._recipe_repository.get_by_id(recipe_id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        ingredient = RecipeIngredient(id=None, quantity=recipe_ingredient_create_dto.quantity, ingredient_id=recipe_ingredient_create_dto.ingredient_id, ingredient_measurement_unit_id=recipe_ingredient_create_dto.measurement_unit_id, recipe_id=recipe_id)
+        ingredient = RecipeIngredient(id=None, quantity=recipe_ingredient_create_dto.quantity, ingredient_id=recipe_ingredient_create_dto.ingredient_id, ingredient_measurement_unit_id=recipe_ingredient_create_dto.ingredient_measurement_unit_id, recipe_id=recipe_id)
         try:
             created_ingredient = self._recipe_ingredient_repository.save(recipe_id=recipe_id, ingredient=ingredient)
         except domain_exceptions.DatabaseIntegrityDomainException:
             raise application_exceptions.EntityValidationApplicationException()
-        return RecipeIngredientDto(id=created_ingredient.id, quantity=created_ingredient.quantity, ingredient_id=created_ingredient.ingredient_id, measurement_unit_id=created_ingredient.ingredient_measurement_unit_id, recipe_id=created_ingredient.recipe_id)
+        return RecipeIngredientDto(id=created_ingredient.id, quantity=created_ingredient.quantity, ingredient_id=created_ingredient.ingredient_id, ingredient_measurement_unit_id=created_ingredient.ingredient_measurement_unit_id, recipe_id=created_ingredient.recipe_id)
 
     def get_recipe_ingredient(self, recipe_id: int, id: int) -> RecipeIngredientDto:
         try:
@@ -138,7 +141,7 @@ class RecipeService:
             ingredient = self._recipe_ingredient_repository.get_by_id(recipe_id=recipe_id, id=id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException
-        return RecipeIngredientDto(id=ingredient.id, quantity=ingredient.quantity, ingredient_id=ingredient.ingredient_id, measurement_unit_id=ingredient.ingredient_measurement_unit_id, recipe_id=ingredient.recipe_id)
+        return RecipeIngredientDto(id=ingredient.id, quantity=ingredient.quantity, ingredient_id=ingredient.ingredient_id, ingredient_measurement_unit_id=ingredient.ingredient_measurement_unit_id, recipe_id=ingredient.recipe_id)
 
     def list_recipe_ingredients(self, recipe_id: int, limit: int = 1000, offset: int = 0) -> List[RecipeIngredientDto]:
         try:
@@ -146,7 +149,7 @@ class RecipeService:
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
         ingredients = self._recipe_ingredient_repository.get_all(recipe_id=recipe_id, limit=limit, offset=offset)
-        return [RecipeIngredientDto(id=i.id, quantity=i.quantity, ingredient_id=i.ingredient_id, recipe_id=i.recipe_id, measurement_unit_id=i.ingredient_measurement_unit_id) for i in ingredients]
+        return [RecipeIngredientDto(id=i.id, quantity=i.quantity, ingredient_id=i.ingredient_id, recipe_id=i.recipe_id, ingredient_measurement_unit_id=i.ingredient_measurement_unit_id) for i in ingredients]
 
     def update_recipe_ingredient(self, recipe_id: int, id: int, ingredient_update_dto: RecipeIngredientUpdateDto) -> RecipeIngredientDto:
         try:
@@ -157,13 +160,13 @@ class RecipeService:
             ingredient = self._recipe_ingredient_repository.get_by_id(recipe_id=recipe_id, id=id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        ingredient.ingredient_measurement_unit_id = ingredient_update_dto.measurement_unit_id
+        ingredient.ingredient_measurement_unit_id = ingredient_update_dto.ingredient_measurement_unit_id
         ingredient.quantity = ingredient_update_dto.quantity
         try:
             updated_ingredient = self._recipe_ingredient_repository.save(recipe_id=recipe_id, ingredient=ingredient)
         except domain_exceptions.DatabaseIntegrityDomainException:
             raise application_exceptions.EntityValidationApplicationException()
-        return RecipeIngredientDto(id=updated_ingredient.id, quantity=updated_ingredient.quantity, ingredient_id=updated_ingredient.ingredient_id, recipe_id=updated_ingredient.recipe_id, measurement_unit_id=updated_ingredient.ingredient_measurement_unit_id)
+        return RecipeIngredientDto(id=updated_ingredient.id, quantity=updated_ingredient.quantity, ingredient_id=updated_ingredient.ingredient_id, recipe_id=updated_ingredient.recipe_id, ingredient_measurement_unit_id=updated_ingredient.ingredient_measurement_unit_id)
 
     def delete_recipe_ingredient(self, recipe_id: int, id: int) -> None:
         try:
@@ -248,10 +251,11 @@ class RecipeService:
 
     def delete_recipe(self, id: int) -> None:
         try:
-            recipe = self._recipe_repository.get_by_id(id)
+            return self._recipe_repository.delete(id)
         except domain_exceptions.NotFoundDomainException:
             raise application_exceptions.EntityNotFoundApplicationException()
-        return self._recipe_repository.delete(id)
+        except domain_exceptions.DatabaseIntegrityDomainException:
+            raise application_exceptions.EntityValidationApplicationException()
 
     def create_ingredient(self, ingredient_create_dto: IngredientCreateDto) -> IngredientDto:
         try:

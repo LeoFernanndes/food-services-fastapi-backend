@@ -24,12 +24,9 @@ class RecipeOrmModel(Base, BaseOrmModel):
     portions_quantity = mapped_column(Integer, nullable=False, unique=False)
     category_id = mapped_column(ForeignKey('recipe_categories.id'))
     category: Mapped["CategoryOrmModel"] = relationship("RecipeCategoryOrmModel")
-    recipe_ingredients: Mapped[List["RecipeIngredientOrmModel"]] = relationship("RecipeIngredientOrmModel")
+    recipe_ingredients: Mapped[List["RecipeIngredientOrmModel"]] = relationship("RecipeIngredientOrmModel", cascade='all')
 
     def to_domain(self) -> Recipe:
-        # ingredients_entities = [i.to_domain() for i in self.ingredients]
-        # user_profile_entity = self.user_profile.to_domain()
-        # category_entity = self.category.to_domain()
         return Recipe(
             id=self.id, name=self.name, title=self.title, description=self.description,
             user_profile_id=self.user_profile_id, preparation_time_minutes=self.preparation_time_minutes,
