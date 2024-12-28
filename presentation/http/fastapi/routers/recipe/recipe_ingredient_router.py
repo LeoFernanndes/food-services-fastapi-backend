@@ -58,7 +58,7 @@ def update_recipe_ingredient(recipe_id: int, id: int, ingredient_update_dto: Rec
         raise HTTPException(500, detail='Internal server error')
 
 
-@recipe_ingredient_router.delete('/{id}')
+@recipe_ingredient_router.delete('/{id}', status_code=204)
 def delete_recipe_ingredient(recipe_id: int, id: int, recipe_service: RecipeService = Depends(get_recipe_service)) -> None:
     try:
         return recipe_service.delete_recipe_ingredient(recipe_id=recipe_id, id=id)
