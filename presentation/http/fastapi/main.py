@@ -3,6 +3,8 @@ import uvicorn
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from presentation.http.fastapi.routers.user import user_router
@@ -48,6 +50,20 @@ app.add_middleware(
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(recipes_management_router, prefix="/recipes-management", tags=['recipes-management'])
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    
+    errors = {}
+    for error in exc._errors:
+        if error['loc'][1] not in errors.keys():
+            errors[error['loc'][1]] = []
+        errors[error['loc'][1]].append(error['msg'])
+    exc._errors = errors
+    
+    return await request_validation_exception_handler(request, exc)
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info", reload_excludes=["./database/*"])
