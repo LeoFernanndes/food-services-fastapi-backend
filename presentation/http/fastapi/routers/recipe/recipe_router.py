@@ -12,7 +12,7 @@ from presentation.http.fastapi.routers.recipe.recipe_ingredient_router import re
 recipe_router = APIRouter()
 
 
-@recipe_router.post('/')
+@recipe_router.post('/', status_code=201)
 def create_recipe(recipe_create_dto: RecipeCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> RecipeDto:
     try:
         return recipe_service.create_recipe(recipe_create_dto)
