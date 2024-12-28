@@ -8,7 +8,7 @@ class BaseRecipeIngredientDto(BaseDto):
 class RecipeIngredientCreateDto(BaseRecipeIngredientDto):
     quantity: int
     ingredient_id: int
-    measurement_unit_id: int
+    ingredient_measurement_unit_id: int
 
 
 class RecipeIngredientDto(RecipeIngredientCreateDto):
@@ -18,4 +18,4 @@ class RecipeIngredientDto(RecipeIngredientCreateDto):
 
 class RecipeIngredientUpdateDto(BaseRecipeIngredientDto):
     quantity: int
-    measurement_unit_id: int
+    ingredient_measurement_unit_id: int
