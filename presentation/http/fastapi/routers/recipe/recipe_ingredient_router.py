@@ -14,7 +14,7 @@ from presentation.dependencies import get_recipe_service
 recipe_ingredient_router = APIRouter()
 
 
-@recipe_ingredient_router.post('/')
+@recipe_ingredient_router.post('/', status_code=201)
 def create_recipe_ingredient(recipe_id: int, ingredient_create_dto: RecipeIngredientCreateDto, recipe_service: RecipeService = Depends(get_recipe_service)) -> RecipeIngredientDto:
     try:
         return recipe_service.create_recipe_ingredient(recipe_id=recipe_id, recipe_ingredient_create_dto=ingredient_create_dto)
