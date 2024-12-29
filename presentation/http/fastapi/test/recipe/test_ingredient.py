@@ -145,6 +145,18 @@ def test_post_ingredient_201(seed_data, client):
     }
     assert response.status_code == 201
     assert response.json() == expected_result
+    
+
+def test_post_ingredient_missing_field_422(seed_data, client):
+    payload = {}
+    response = client.post('/recipes-management/ingredients', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_post_ingredient_400(seed_data, client):
@@ -163,6 +175,18 @@ def test_put_ingredient_200(seed_data, client):
         "name": "arroz tipo 2"
     }
     assert response.status_code == 200
+    assert response.json() == expected_result
+
+
+def test_put_ingredient_missing_field_422(seed_data, client):
+    payload = {}
+    response = client.put('/recipes-management/ingredients/1', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
     assert response.json() == expected_result
 
 

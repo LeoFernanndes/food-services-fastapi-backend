@@ -149,6 +149,18 @@ def test_post_category_201(seed_data, client):
     assert response.json() == expected_result
 
 
+def test_post_recipe_category_missing_field_422(seed_data, client):
+    payload = {}
+    response = client.post('/recipes-management/recipe-categories', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
+
+
 def test_post_category_400(seed_data, client):
     payload = {
         'name': 'soup'
@@ -167,6 +179,18 @@ def test_put_category_200(seed_data, client):
         'name': 'beans'
     }
     assert response.status_code == 200
+    assert response.json() == expected_result
+
+
+def test_put_recipe_category_missing_field_422(seed_data, client):
+    payload = {}
+    response = client.put('/recipes-management/recipe-categories/1', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
     assert response.json() == expected_result
 
 

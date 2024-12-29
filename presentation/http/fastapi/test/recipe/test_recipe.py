@@ -165,6 +165,26 @@ def test_post_recipe_201(seed_data, client):
     assert json_response == expected_result
     
 
+def test_post_recipe_missing_fields_422(seed_data, client):
+    payload = {}
+    response = client.post("/recipes-management/recipes/", json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required'],
+            'title': ['Field required'],
+            'description': ['Field required'],
+            'user_profile_id': ['Field required'],
+            'preparation_time_minutes': ['Field required'],
+            'preparation_steps': ['Field required'],
+            'main_image':['Field required'],
+            'portions_quantity': ['Field required'],
+            'category_id': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
+    
+
 def test_post_recipe_violating_pk_contraints_400(seed_data, client):
     payload = {
         'name':'sopinha', 'title':'feijoada', 'description':'feijão temperado com carnes', 'user_profile_id':404,
@@ -190,6 +210,25 @@ def test_put_recipe_200(seed_data, client):
     json_response = response.json()
     assert response.status_code == 200
     assert json_response == expected_result
+    
+
+def test_put_recipe_missing_fields_422(seed_data, client):
+    payload = {}
+    response = client.put("/recipes-management/recipes/1", json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required'],
+            'title': ['Field required'],
+            'description': ['Field required'],
+            'preparation_time_minutes': ['Field required'],
+            'preparation_steps': ['Field required'],
+            'main_image':['Field required'],
+            'portions_quantity': ['Field required'],
+            'category_id': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_put_recipe_404(seed_data, client):

@@ -156,6 +156,18 @@ def test_post_ingredient_measurement_unit_201(seed_data, client):
     json_response = response.json()
     assert response.status_code == 201
     assert json_response == expected_result
+    
+
+def test_post_ingredient_measurement_unit_missing_fields_422(seed_data, client):
+    payload = {}
+    response = client.post('/recipes-management/ingredient-measurement-units', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_post_ingredient_measurement_unit_400(seed_data, client):
@@ -179,6 +191,18 @@ def test_put_ingredient_measurement_unit_200(seed_data, client):
     json_response = response.json()
     assert response.status_code == 200
     assert json_response == expected_result
+
+
+def test_put_ingredient_measurement_unit_missing_fields_422(seed_data, client):
+    payload = {}
+    response = client.put('/recipes-management/ingredient-measurement-units/1', json=payload)
+    expected_result = {
+        'detail': {
+            'name': ['Field required']
+        }
+    }
+    assert response.status_code == 422
+    assert response.json() == expected_result
 
 
 def test_put_ingredient_measurement_unit_404(seed_data, client):
